@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+
+  database:
+    container_name: mysql_c
+    image: mysql:latest
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=testdb
+    volumes:
+      - mysqlDB:/var/lib/mysql
+    networks:
+      - backend
+
+  api:
+    container_name: demo-app-be
+    image: demo-be
+    depends_on:
+      - database
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASSWORD=123456
+      - DB_NAME=testdb
+      - DB_PORT=3306
+      - CLIENT_ORIGIN=http://localhost
+    networks:
+      - backend
+      - front-end
+
+  front-end:
+    container_name: demo-app-fe
+    image: demo-fe
+    restart: always
+    ports:
+      - 80:80
+    networks:
+      - front-end
+
+volumes:
+  mysqlDB:
+
+networks:
+  backend:
+  front-end:
